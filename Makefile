@@ -192,9 +192,8 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 # "make" in the configured kernel build directory always uses that.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-
-ARCH		?=arm64
-CROSS_COMPILE	?=../PLATFORM/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+ARCH		?= $(SUBARCH)
+CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -240,10 +239,10 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
-HOSTCC       = gcc
-HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-HOSTCXXFLAGS = -O2
+HOSTCC       = $(CCACHE) gcc
+HOSTCXX      = $(CCACHE) g++
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer $(GRAPHITE)
+HOSTCXXFLAGS = -Ofast $(GRAPHITE)
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -380,16 +379,46 @@ LINUXINCLUDE    := \
 
 KBUILD_CPPFLAGS := -D__KERNEL__
 
-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-                   -w \
-		   -fno-strict-aliasing -fno-common \
-		   -Werror-implicit-function-declaration \
-		   -Wno-format-security \
-            -Werror \
-		   -fno-delete-null-pointer-checks \
-		   -fdiagnostics-show-option -Werror \
-           -Ofast -Wno-maybe-uninitialized \
-            -std=gnu89
+# Warnings
+KBUILD_CFLAGS := \
+	-Wall \
+	-Werror \
+	-Wundef \
+	-Wno-format-security \
+	-Wno-implicit-function-declaration \
+	-Wno-maybe-uninitialized \
+	-Wno-trigraphs
+
+# Flags
+KBUILD_CFLAGS += \
+	-fdiagnostics-show-option \
+	-ffast-math \
+	-fno-common \
+	-fno-delete-null-pointer-checks \
+	-fno-strict-aliasing \
+	-march=armv8-a+crc \
+	-ftree-vectorize \
+	-mcpu=cortex-a57.cortex-a53 \
+	-mtune=cortex-a57.cortex-a53 \
+	-std=gnu89 \
+	-Ofast
+
+# Linaro
+KBUILD_CFLAGS += \
+	-Wno-array-bounds \
+	-Wno-bool-operation \
+	-Wno-discarded-array-qualifiers \
+	-Wno-int-in-bool-context \
+	-Wno-format-overflow \
+	-Wno-format-truncation \
+	-Wno-logical-not-parentheses \
+	-Wno-memset-elt-size \
+	-Wno-misleading-indentation \
+	-Wno-nonnull \
+	-Wno-switch-unreachable \
+	-Wno-switch-bool \
+	-Wno-tautological-compare \
+	-Wno-unused-const-variable
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
@@ -457,6 +486,10 @@ asm-generic:
 	            src=asm obj=arch/$(SRCARCH)/include/generated/asm
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
 	            src=uapi/asm obj=arch/$(SRCARCH)/include/generated/uapi/asm
+
+# Set Android version as Q
+export PLATFORM_VERSION=10.0.0
+KBUILD_CFLAGS += -DPLATFORM_VERSION=10.0.0
 
 ifneq ($(PLATFORM_VERSION), )
 PLATFORM_VERSION_NUMBER=$(shell $(CONFIG_SHELL) $(srctree)/scripts/android-version.sh $(PLATFORM_VERSION))
@@ -609,6 +642,12 @@ endif # $(dot-config)
 # This allow a user to issue only 'make' to build a kernel including modules
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
+
+ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+else
+KBUILD_CFLAGS	+= -O2
+endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
