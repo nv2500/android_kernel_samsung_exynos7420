@@ -1,6 +1,6 @@
 /* linux/drivers/cpufreq/pmu_func.h
  *
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd.
  *              http://www.samsung.com
  *
  * This program is free software; you can redistribute it and/or modify
@@ -104,7 +104,7 @@ static inline void reset_ccnt(void)
 {
 	u32 val;
 	asm volatile("mrs %0, PMCR_EL0" : "=r"(val));
-	val = val | 0x4;	// set C bit
+	val = val | 0x6;	// set C bit
 	asm volatile("msr PMCR_EL0, %0" : : "r"(val));
 }
 

@@ -268,7 +268,7 @@ void vfsspi_fp_homekey_ev(void)
 #endif
 		vfsspi_set_retain_pin(g_data, 1, 0);
 	} else
-		pr_err("%s : not set the retain pin!\n", __func__);
+		pr_info("%s : not set the retain pin!\n", __func__);
 }
 #endif
 
@@ -1567,7 +1567,10 @@ static ssize_t vfsspi_adm_show(struct device *dev,
 static ssize_t vfsspi_retain_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
-	return sprintf(buf, "%d\n", gpio_get_value(g_data->retain_pin));
+	if (g_data->retain_pin)
+		return sprintf(buf, "%d\n", gpio_get_value(g_data->retain_pin));
+	else
+		return sprintf(buf, "-1\n");
 }
 
 static ssize_t vfsspi_retain_store(struct device *dev,

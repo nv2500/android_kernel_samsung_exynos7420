@@ -362,7 +362,7 @@ static struct global_attr dm_hotplug_delay =
 			show_dm_hotplug_delay, store_dm_hotplug_delay);
 #endif
 
-static inline u64 get_cpu_idle_time_jiffy(unsigned int cpu, u64 *wall)
+static inline u64 get_cpu_idle_time_jiffy1(unsigned int cpu, u64 *wall)
 {
 	u64 idle_time;
 	u64 cur_wall_time;
@@ -384,12 +384,12 @@ static inline u64 get_cpu_idle_time_jiffy(unsigned int cpu, u64 *wall)
 	return jiffies_to_usecs(idle_time);
 }
 
-static inline cputime64_t get_cpu_idle_time(unsigned int cpu, cputime64_t *wall)
+static inline cputime64_t get_cpu_idle_time1(unsigned int cpu, cputime64_t *wall)
 {
 	u64 idle_time = get_cpu_idle_time_us(cpu, NULL);
 
 	if (idle_time == -1ULL)
-		return get_cpu_idle_time_jiffy(cpu, wall);
+		return get_cpu_idle_time_jiffy1(cpu, wall);
 	else
 		idle_time += get_cpu_iowait_time_us(cpu, wall);
 
@@ -632,7 +632,10 @@ static int __ref __cpu_hotplug(bool out_flag, enum hotplug_cmd cmd)
 						}
 					}
 				} else {
-					for (i = 1; i < NR_CLUST0_CPUS; i++) { 
+					for (i = 1; i < setup_max_cpus; i++) {
+						if (do_hotplug_out && i >= NR_CLUST0_CPUS)
+							goto blk_out;
+
 						if (!cpu_online(i)) {
 							ret = cpu_up(i);
 							if (ret)
@@ -1047,7 +1050,7 @@ static void calc_load(void)
 
 		i_load_info = &per_cpu(cur_cpu_info, i);
 
-		cur_idle_time = get_cpu_idle_time(i, &cur_wall_time);
+		cur_idle_time = get_cpu_idle_time1(i, &cur_wall_time);
 		cur_iowait_time = get_cpu_iowait_time(i, &cur_wall_time);
 
 		wall_time = (unsigned int)
@@ -1098,6 +1101,9 @@ static int on_run(void *data)
 				exe_cmd = diagnose_condition();
 
 		if (exynos_dm_hotplug_disabled()) {
+#ifdef DM_HOTPLUG_DEBUG
+			pr_info("dm_hotplug disable = %d\n", exynos_dm_hotplug_disabled());
+#endif
 			goto sleep;
 		}
 

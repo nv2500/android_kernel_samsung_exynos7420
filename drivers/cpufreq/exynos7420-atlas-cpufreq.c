@@ -98,8 +98,8 @@ static struct apll_freq exynos7420_apll_freq_CA57[] = {
 	 * PLL M, P, S values are NOT used, Instead CCF clk_set_rate is used
 	 */
 	APLL_ATLAS_FREQ(2496, 0, 0, 2, 6, 6, 6, 1, 5, 6, 208, 2, 0),    /* ARM L0: 2.5GHz  */
-	APLL_ATLAS_FREQ(2400, 0, 0, 2, 6, 6, 6, 1, 5, 6, 200, 2, 0),    /* ARM L1: 2.4GMHz */
-	APLL_ATLAS_FREQ(2304, 0, 0, 2, 6, 6, 6, 1, 5, 6, 192, 2, 0),    /* ARM L2: 2.3GMHz */
+	APLL_ATLAS_FREQ(2400, 0, 0, 2, 6, 6, 6, 1, 5, 6, 200, 2, 0),    /* ARM L1: 2.4GHz */
+	APLL_ATLAS_FREQ(2304, 0, 0, 2, 6, 6, 6, 1, 5, 6, 192, 2, 0),    /* ARM L2: 2.3GHz */
 	APLL_ATLAS_FREQ(2200, 0, 0, 2, 6, 6, 6, 1, 5, 6, 275, 3, 0),    /* ARM L3: 2.2GHz  */
 	APLL_ATLAS_FREQ(2100, 0, 0, 2, 6, 6, 6, 1, 5, 6, 175, 2, 0),    /* ARM L4: 2.1GHz  */
 	APLL_ATLAS_FREQ(2000, 0, 0, 2, 6, 6, 6, 1, 5, 6, 250, 3, 0),    /* ARM L5: 2.0GHz  */
@@ -127,41 +127,30 @@ static struct apll_freq exynos7420_apll_freq_CA57[] = {
  * ASV group voltage table
  */
 static const unsigned int asv_voltage_7420_CA57[CPUFREQ_LEVEL_END_CA57] = {
-#ifdef CONFIG_EXYNOS7420_OVERCLOCK
-	1450000,	/* L0  2500 */
-	1400000,	/* L1  2400 */
-	1350000,	/* L2  2300 */
-	1300000,	/* L3  2200 */
-	1375000,	/* L0  2500 */
-	1325000,	/* L1  2400 */
-	1275000,	/* L2  2300 */
-	1225000,	/* L3  2200 */
-#else
 	1250000,	/* L0  2500 */
 	1250000,	/* L1  2400 */
 	1250000,	/* L2  2300 */
 	1250000,	/* L3  2200 */
-#endif
-	1212500,	/* L4  2100 */
-	1162500,	/* L5  2000 */
-	1118750,	/* L6  1900 */
-	1081250,	/* L7  1800 */
-	1043750,	/* L8  1700 */
-	1006250,	/* L9  1600 */
-	 975000,	/* L10 1500 */
-	 943750,	/* L11 1400 */
-	 912500,	/* L12 1300 */
-	 887500,	/* L13 1200 */
-	 862500,	/* L14 1100 */
-	 837500,	/* L15 1000 */
-	 812500,	/* L16  900 */
-	 787500,	/* L17  800 */
-	 762500,	/* L18  700 */
-	 737500,	/* L19  600 */
-	 712500,	/* L20  500 */
-	 687500,	/* L21  400 */
-	 662500,	/* L22  300 */
-	 637500,	/* L23  200 */
+	1012500,	/* L4  2100 */
+	 975000,	/* L5  2000 */
+	 937500,	/* L6  1900 */
+	 900000,	/* L7  1800 */
+	 868750,	/* L8  1700 */
+	 837500,	/* L9  1600 */
+	 806250,	/* L10 1500 */
+	 781250,	/* L11 1400 */
+	 756250,	/* L12 1300 */
+	 737500,	/* L13 1200 */
+	 712500,	/* L14 1100 */
+	 687500,	/* L15 1000 */
+	 668750,	/* L16  900 */
+	 650000,	/* L17  800 */
+	 631250,	/* L18  700 */
+	 612500,	/* L19  600 */
+	 600000,	/* L20  500 */
+	 600000,	/* L21  400 */
+	 600000,	/* L22  300 */
+	 600000,	/* L23  200 */
 };
 
 /* minimum memory throughput in megabytes per second */
@@ -391,11 +380,11 @@ static void __init set_volt_table_CA57(void)
 	case 1 :
 	case 4 :
 	case 12 :
-		max_support_idx_CA57 = L7; break;	/* 1.8GHz */
+		max_support_idx_CA57 = L8; break;	/* 1.704GHz */
 	case 5 :
 		max_support_idx_CA57 = L10; break;	/* 1.5GHz */
 	default :
-		max_support_idx_CA57 = L4;		/* 2.1GHz */
+		max_support_idx_CA57 = L6;		/* 1.896GHz */
 	}
 #else
 	max_support_idx_CA57 = L13;	/* 1.2 GHz */

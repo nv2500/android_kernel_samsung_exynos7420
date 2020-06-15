@@ -491,12 +491,12 @@ struct ipv6_work_info_t {
 	unsigned long		event;
 };
 
-#ifdef DHD_DEBUG
+//#ifdef DHD_DEBUG
 typedef struct dhd_dump {
 	uint8 *buf;
 	int bufsize;
 } dhd_dump_t;
-#endif /* DHD_DEBUG */
+//#endif /* DHD_DEBUG */
 
 /* When Perimeter locks are deployed, any blocking calls must be preceeded
  * with a PERIM UNLOCK and followed by a PERIM LOCK.
@@ -9003,7 +9003,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 	}
 
 #ifdef GAN_LITE_NAT_KEEPALIVE_FILTER
-	dhd->pktfilter_count = 4;
+	dhd->pktfilter_count = 5;
 	/* Setup filter to block broadcast and NAT Keepalive packets */
 	/* discard all broadcast packets */
 	dhd->pktfilter[DHD_UNICAST_FILTER_NUM] = "100 0 0 0 0xffffff 0xffffff";
@@ -12644,10 +12644,10 @@ int dhd_os_wake_lock_timeout(dhd_pub_t *pub)
 #ifdef CONFIG_HAS_WAKELOCK
 		if (dhd->wakelock_rx_timeout_enable)
 			wake_lock_timeout(&dhd->wl_rxwake,
-				msecs_to_jiffies(dhd->wakelock_rx_timeout_enable));
+				msecs_to_jiffies(dhd->wakelock_rx_timeout_enable)/5);
 		if (dhd->wakelock_ctrl_timeout_enable)
 			wake_lock_timeout(&dhd->wl_ctrlwake,
-				msecs_to_jiffies(dhd->wakelock_ctrl_timeout_enable));
+				msecs_to_jiffies(dhd->wakelock_ctrl_timeout_enable)/5);
 #endif
 		dhd->wakelock_rx_timeout_enable = 0;
 		dhd->wakelock_ctrl_timeout_enable = 0;
@@ -13863,10 +13863,10 @@ dhd_mem_dump(void *handle, void *event_info, u8 event)
 		return;
 	}
 
-	if (write_to_file(&dhd->pub, dump->buf, dump->bufsize)) {
+	/*if (write_to_file(&dhd->pub, dump->buf, dump->bufsize)) {
 		DHD_ERROR(("%s: writing SoC_RAM dump to the file failed\n", __FUNCTION__));
 		dhd->pub.memdump_success = FALSE;
-	}
+	}*/
 
 	if (dhd->pub.memdump_enabled == DUMP_MEMFILE_BUGON &&
 #ifdef DHD_LOG_DUMP

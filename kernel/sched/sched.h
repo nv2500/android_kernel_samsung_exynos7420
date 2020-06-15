@@ -588,7 +588,32 @@ static inline struct sched_domain *highest_flag_domain(int cpu, int flag)
 }
 
 DECLARE_PER_CPU(struct sched_domain *, sd_llc);
+DECLARE_PER_CPU(int, sd_llc_size);
 DECLARE_PER_CPU(int, sd_llc_id);
+DECLARE_PER_CPU(struct sched_domain *, sd_numa);
+DECLARE_PER_CPU(struct sched_domain *, sd_busy);
+DECLARE_PER_CPU(struct sched_domain *, sd_asym);
+DECLARE_PER_CPU(struct sched_domain *, sd_ea);
+DECLARE_PER_CPU(struct sched_domain *, sd_scs);
+
+struct sched_group_capacity {
+	atomic_t ref;
+	/*
+	 * CPU capacity of this group, SCHED_LOAD_SCALE being max capacity
+	 * for a single CPU.
+	 */
+	unsigned long capacity;
+	unsigned long max_capacity; /* Max per-cpu capacity in group */
+	unsigned long min_capacity; /* Min per-CPU capacity in group */
+	unsigned long next_update;
+	int imbalance; /* XXX unrelated to capacity but shared group state */
+	/*
+	 * Number of busy cpus in this group.
+	 */
+	atomic_t nr_busy_cpus;
+
+	unsigned long cpumask[0]; /* iteration mask */
+};
 
 struct sched_group_power {
 	atomic_t ref;
@@ -612,6 +637,8 @@ struct sched_group {
 
 	unsigned int group_weight;
 	struct sched_group_power *sgp;
+	struct sched_group_capacity *sgc;
+	const struct sched_group_energy const *sge;
 
 	/*
 	 * The CPUs this group covers.
@@ -1089,20 +1116,15 @@ static inline void inc_nr_running(struct rq *rq)
 {
 	rq->nr_running++;
 
-	if (rq->nr_running >= 2) {
-#ifdef CONFIG_SMP
-		if (!rq->rd->overload)
-			rq->rd->overload = true;
-#endif
-
 #ifdef CONFIG_NO_HZ_FULL
+	if (rq->nr_running == 2) {
 		if (tick_nohz_full_cpu(rq->cpu)) {
 			/* Order rq->nr_running write against the IPI */
 			smp_wmb();
 			smp_send_reschedule(rq->cpu);
 		}
-#endif
        }
+#endif
 }
 
 static inline void dec_nr_running(struct rq *rq)
