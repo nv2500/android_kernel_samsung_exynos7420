@@ -98,7 +98,7 @@ static struct slow_mode_tunables slow_tunables;
 
 static struct device *sec_slow;
 
-static inline u64 get_cpu_idle_time_jiffy(unsigned int cpu, u64 *wall)
+static inline u64 get_cpu_idle_time_jiffy1(unsigned int cpu, u64 *wall)
 {
 	u64 idle_time;
 	u64 cur_wall_time;
@@ -120,12 +120,12 @@ static inline u64 get_cpu_idle_time_jiffy(unsigned int cpu, u64 *wall)
 	return cputime_to_usecs(idle_time);
 }
 
-static u64 get_cpu_idle_time(unsigned int cpu, u64 *wall, int io_busy)
+static u64 get_cpu_idle_time1(unsigned int cpu, u64 *wall, int io_busy)
 {
 	u64 idle_time = get_cpu_idle_time_us(cpu, io_busy ? wall : NULL);
 
 	if (idle_time == -1ULL)
-		return get_cpu_idle_time_jiffy(cpu, wall);
+		return get_cpu_idle_time_jiffy1(cpu, wall);
 	else if (!io_busy)
 		idle_time += get_cpu_iowait_time_us(cpu, wall);
 
@@ -135,7 +135,7 @@ static u64 get_cpu_idle_time(unsigned int cpu, u64 *wall, int io_busy)
 static void observer_load_start(struct observer_cpuinfo *pcpu, int cpu, bool io_busy)
 {
 	pcpu->time_in_idle =
-		get_cpu_idle_time(cpu, &pcpu->time_in_idle_timestamp,
+		get_cpu_idle_time1(cpu, &pcpu->time_in_idle_timestamp,
 				  io_busy);
 	pcpu->cputime_speedadj = 0;
 	pcpu->cputime_speedadj_timestamp = pcpu->time_in_idle_timestamp;
@@ -186,7 +186,7 @@ static u64 update_load(int cpu)
 	unsigned int delta_idle;
 	unsigned int delta_time;
 	u64 active_time;
-	now_idle = get_cpu_idle_time(cpu, &now, tunables->io_is_busy);
+	now_idle = get_cpu_idle_time1(cpu, &now, tunables->io_is_busy);
 	delta_idle = (unsigned int)(now_idle - pcpu->time_in_idle);
 	delta_time = (unsigned int)(now - pcpu->time_in_idle_timestamp);
 
