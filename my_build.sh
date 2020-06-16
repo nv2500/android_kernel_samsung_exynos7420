@@ -5,7 +5,7 @@ export MODEL=noblelte
 export ARCH=arm64
 
 # Kernel Variables
-CR_VERSION=Q.1.1
+CR_VERSION=Q.1.2
 CR_NAME=khoailang2500
 CR_JOBS=5
 CR_ANDROID=q
@@ -19,8 +19,8 @@ export PLATFORM_VERSION=$CR_PLATFORM
 export $CR_ARCH
 
 # GG Cloud setup
-export BUILD_CROSS_COMPILE=../tools/aarch64-linux-android-4.9/bin/aarch64-linux-android-
-# export BUILD_CROSS_COMPILE=../tools/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+# export BUILD_CROSS_COMPILE=../tools/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+export BUILD_CROSS_COMPILE=../tools/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 
 export BUILD_JOB_NUMBER=5
 
