@@ -37,7 +37,25 @@ struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
 	__k;								   \
 })
 
+/**
+ * kthread_run_perf_critical - create and wake a performance-critical thread.
+ *
+ * Same as kthread_create().
+ */
+#define kthread_run_perf_critical(threadfn, data, namefmt, ...)		   \
+({									   \
+	struct task_struct *__k						   \
+		= kthread_create(threadfn, data, namefmt, ## __VA_ARGS__); \
+	if (!IS_ERR(__k)) {						   \
+		__k->flags |= PF_PERF_CRITICAL;				   \
+		kthread_bind_mask(__k, cpu_perf_mask);			   \
+		wake_up_process(__k);					   \
+	}								   \
+	__k;								   \
+})
+
 void kthread_bind(struct task_struct *k, unsigned int cpu);
+void kthread_bind_mask(struct task_struct *k, const struct cpumask *mask);
 int kthread_stop(struct task_struct *k);
 bool kthread_should_stop(void);
 bool kthread_should_park(void);
@@ -75,6 +93,8 @@ struct kthread_work {
 	kthread_work_func_t	func;
 	wait_queue_head_t	done;
 	struct kthread_worker	*worker;
+	/* Number of canceling calls that are running at the moment. */
+	int			canceling;
 };
 
 #define KTHREAD_WORKER_INIT(worker)	{				\
@@ -136,5 +156,18 @@ bool queue_kthread_work(struct kthread_worker *worker,
 			struct kthread_work *work);
 void flush_kthread_work(struct kthread_work *work);
 void flush_kthread_worker(struct kthread_worker *worker);
+
+/*
+ * Returns true when the work could not be queued at the moment.
+ * It happens when it is already pending in a worker list
+ * or when it is being cancelled.
+ */
+static inline bool queuing_blocked(struct kthread_worker *worker,
+                                   struct kthread_work *work)
+{
+        lockdep_assert_held(&worker->lock);
+
+        return !list_empty(&work->node) || work->canceling;
+}
 
 #endif /* _LINUX_KTHREAD_H */

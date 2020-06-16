@@ -6720,7 +6720,7 @@ dhd_preinit_ioctls(dhd_pub_t *dhd)
 
 #ifdef CUSTOMER_HW4
 #ifdef GAN_LITE_NAT_KEEPALIVE_FILTER
-	dhd->pktfilter_count = 5;
+	dhd->pktfilter_count = 4;
 	/* Setup filter to block broadcast and NAT Keepalive packets */
 	/* discard all broadcast packets */
 	dhd->pktfilter[DHD_UNICAST_FILTER_NUM] = "100 0 0 0 0xffffff 0xffffff";
