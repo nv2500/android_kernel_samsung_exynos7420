@@ -5,7 +5,7 @@ export MODEL=noblelte
 export ARCH=arm64
 
 # Kernel Variables
-CR_VERSION=Q.1.3
+CR_VERSION=Q.1.4
 CR_NAME=khoailang2500
 CR_JOBS=5
 CR_ANDROID=q
@@ -127,15 +127,15 @@ FUNC_BUILD_KERNEL()
 FUNC_BUILD_RAMDISK()
 {
 	mv $RDIR/arch/$ARCH/boot/Image $RDIR/arch/$ARCH/boot/boot.img-zImage
-	mv $RDIR/arch/$ARCH/boot/dtb.img $RDIR/arch/$ARCH/boot/boot.img-dtb
+	# mv $RDIR/arch/$ARCH/boot/dtb.img $RDIR/arch/$ARCH/boot/boot.img-dtb
 
 	RDIR_RELEASE_BIN=$RDIR/release_binary
 	# remove old kernel files
 	rm -f $RDIR_RELEASE_BIN/split_img/boot.img-zImage
-	rm -f $RDIR_RELEASE_BIN/split_img/boot.img-dtb
+	# rm -f $RDIR_RELEASE_BIN/split_img/boot.img-dtb
 	# copy new one
 	cp $RDIR/arch/$ARCH/boot/boot.img-zImage $RDIR_RELEASE_BIN/split_img/boot.img-zImage
-	cp $RDIR/arch/$ARCH/boot/boot.img-dtb $RDIR_RELEASE_BIN/split_img/boot.img-dtb
+	# cp $RDIR/arch/$ARCH/boot/boot.img-dtb $RDIR_RELEASE_BIN/split_img/boot.img-dtb
 	cd $RDIR_RELEASE_BIN/
 	cd ramdisk
 	chmod +x ./ramdisk_fix_permissions.sh
