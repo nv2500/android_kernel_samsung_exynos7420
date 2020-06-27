@@ -16,7 +16,7 @@
 
 #define BOEFFLA_WL_BLOCKER_VERSION	"1.1.0"
 
-#define LIST_WL_DEFAULT				"wlan_rx_wake;wlan_wake;wlan_ctrl_wake;NETLINK;wlan_txfl_wake;bluetooth_timer;BT_bt_wake;BT_host_wake;mmc0_detect;lli_pm_wlock;vfsspi_wake_lock;GPSD;ssp_sensorhub_wake_lock;ssp_wake_lock;bcm4773_wake_lock"
+#define LIST_WL_DEFAULT				"wlan_rx_wake;wlan_wake;wlan_ctrl_wake;NETLINK;wlan_txfl_wake;bluetooth_timer;BT_bt_wake;BT_host_wake;mmc0_detect;lli_pm_wlock;vfsspi_wake_lock;GPSD;ssp_sensorhub_wake_lock;ssp_wake_lock;bcm4773_wake_lock;charger-aicl"
 
 #define LENGTH_LIST_WL			2048
 #define LENGTH_LIST_WL_DEFAULT		255
