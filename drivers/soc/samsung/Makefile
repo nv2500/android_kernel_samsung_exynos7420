@@ -126,3 +126,5 @@ obj-$(CONFIG_SND_SOC_SAMSUNG_NOBLE_CLEARWATER) += snd-soc-noble-arizona.o
 obj-$(CONFIG_SND_SAMSUNG_SEIREN) += seiren/
 
 obj-$(CONFIG_SND_SAMSUNG_DEBUGFS) += samsung_audio_debugfs.o
+
+obj-$(CONFIG_ASMP_HOTPLUG)		+= autosmp.o
