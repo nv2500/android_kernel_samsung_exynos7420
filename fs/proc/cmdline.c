@@ -57,6 +57,12 @@ static int __init proc_cmdline_init(void)
 	proc_cmdline_set("androidboot.boot.ddrinfo", "00000001");
 	proc_cmdline_set("androidboot.crypto.state", "encrypted");
 
+	// SafetyNet checks
+	proc_cmdline_set("androidboot.fmp_config", "1");
+	proc_cmdline_set("androidboot.verifiedbootstate", "green");
+	proc_cmdline_set("androidboot.veritymode", "enforcing");
+	proc_cmdline_set("androidboot.warranty_bit", "0");
+
 	proc_create("cmdline", 0, NULL, &cmdline_proc_fops);
 	return 0;
 }
