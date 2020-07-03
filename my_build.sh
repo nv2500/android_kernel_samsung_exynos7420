@@ -5,7 +5,7 @@ export MODEL=noblelte
 export ARCH=arm64
 
 # Kernel Variables
-CR_VERSION=Q.2.1
+CR_VERSION=Q.2.1-exp
 CR_NAME=khoailang2500
 CR_JOBS=5
 CR_ANDROID=q
